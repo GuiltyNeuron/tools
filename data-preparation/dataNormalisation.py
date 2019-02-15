@@ -32,22 +32,25 @@ features_label = []
 
 # Create output folder if NOT exist
 try:
-    os.stat("./normalized_data")
+    os.stat("./output")
 except:
-    os.mkdir("./normalized_data")
+    os.mkdir("./output")
+
+print("Existing folders :")
 
 # Load all directory from the unnormalized dataset images
 for root, dirs, files in os.walk(directory):
 
     # Filter every folder
+
     for dir in dirs:
         print(dir)
 
         # Create similar folder for storing normalized images if NOT exist
         try:
-            os.stat("./normalized_data"+ "/" + dir + "/")
+            os.stat("./output"+ "/" + dir + "/")
         except:
-            os.mkdir("./normalized_data"+ "/" + dir + "/")
+            os.mkdir("./output"+ "/" + dir + "/")
 
         # Name for the normalized image
         i = 0
@@ -56,22 +59,23 @@ for root, dirs, files in os.walk(directory):
         for filename in os.listdir(directory + "/" + dir):
 
             # Make sure that our file is an image
-            #if (filename.endswith('.png') or filename.endswith('.jpg') or filename.endswith('.tiff')):
+            if (filename.endswith('.png') or filename.endswith('.jpg') or filename.endswith('.tiff')):
 
                 # Read the image
                 image = cv.imread(directory + "/" + dir + "/" + filename)
 
                 # Convert from RGB to Grayscale
-                """gray = cv.cvtColor(image,cv.COLOR_BGR2GRAY)
+                gray = cv.cvtColor(image,cv.COLOR_BGR2GRAY)
 
-                # Threshold the image
-                ret,binary = cv.threshold(gray, 100, 255, cv.THRESH_OTSU)
+
+                """# Threshold the image
+                ret,binary = cv.threshold(gray, 254, 255, cv.THRESH_OTSU)
 
                 # Invert image Black to white and white to black
-                inverted = invert(binary)
+                inverted = invert(binary)"""
 
                 # Make the image in square form without distorsion
-                squared = resizeSquare(inverted,100)
+                squared = resizeSquare(gray,100)
 
                 # Transform the image from 2D vector to 1D vector
                 vector = np.array(squared).ravel()
@@ -83,15 +87,20 @@ for root, dirs, files in os.walk(directory):
 
                 features_label.append(dir)
 
-                # Save the image in the appropriate folder"""
+                # Save the image in the appropriate folder
 
-                cv.imwrite("./normalized_data"+ "/" + dir + "/" +  str(i) +".jpg", image)
+                cv.imwrite("./output"+ "/" + dir + "/" +  str(i) +".jpg", squared)
                 i= i+1
 
 # feature_List and features_label as numpy array
-"""X_train = np.array(features_list)
+X_train = np.array(features_list)
 y_train = np.array(features_label)
 
 # Save the features and their labels in numpy file
-np.save('features', X_train)
-np.save('labels', y_train)"""
+try:
+    os.stat('./output/Numpy_files_data/')
+except:
+    os.mkdir('./output/Numpy_files_data/')
+
+np.save('./output/Numpy_files_data/features', X_train)
+np.save('./output/Numpy_files_data/labels', y_train)
